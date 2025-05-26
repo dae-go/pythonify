@@ -5,77 +5,79 @@ import (
 	"testing"
 )
 
+type zipper [][]any
+
 func TestZip(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    [][]any
-		expected [][]any
+		input    zipper
+		expected zipper
 	}{
 		{
 			name:     "two slices of equal length",
-			input:    [][]any{{1, 2, 3}, {4, 5, 6}},
-			expected: [][]any{{1, 4}, {2, 5}, {3, 6}},
+			input:    zipper{{1, 2, 3}, {4, 5, 6}},
+			expected: zipper{{1, 4}, {2, 5}, {3, 6}},
 		},
 		{
 			name:     "three slices of equal length",
-			input:    [][]any{{1, 2}, {"a", "b"}, {true, false}},
-			expected: [][]any{{1, "a", true}, {2, "b", false}},
+			input:    zipper{{1, 2}, {"a", "b"}, {true, false}},
+			expected: zipper{{1, "a", true}, {2, "b", false}},
 		},
 		{
 			name:     "single slice",
-			input:    [][]any{{1, 2, 3}},
-			expected: [][]any{{1}, {2}, {3}},
+			input:    zipper{{1, 2, 3}},
+			expected: zipper{{1}, {2}, {3}},
 		},
 		{
 			name:     "empty slices",
-			input:    [][]any{{}, {}},
-			expected: [][]any{},
+			input:    zipper{{}, {}},
+			expected: zipper{},
 		},
 		{
 			name:     "slices of different lengths - shorter first",
-			input:    [][]any{{1, 2}, {4, 5, 6}},
-			expected: [][]any{{1, 4}, {2, 5}},
+			input:    zipper{{1, 2}, {4, 5, 6}},
+			expected: zipper{{1, 4}, {2, 5}},
 		},
 		{
 			name:     "slices of different lengths - longer first",
-			input:    [][]any{{1, 2, 3}, {4, 5}},
-			expected: [][]any{{1, 4}, {2, 5}},
+			input:    zipper{{1, 2, 3}, {4, 5}},
+			expected: zipper{{1, 4}, {2, 5}},
 		},
 		{
 			name:     "one empty slice with non-empty slice",
-			input:    [][]any{{}, {1, 2, 3}},
-			expected: [][]any{},
+			input:    zipper{{}, {1, 2, 3}},
+			expected: zipper{},
 		},
 		{
 			name:     "multiple mixed types",
-			input:    [][]any{{1, 2.5, "hello"}, {"world", 42, true}},
-			expected: [][]any{{1, "world"}, {2.5, 42}, {"hello", true}},
+			input:    zipper{{1, 2.5, "hello"}, {"world", 42, true}},
+			expected: zipper{{1, "world"}, {2.5, 42}, {"hello", true}},
 		},
 		// ADDED: Previously separate test cases
 		{
 			name:     "string slices",
-			input:    [][]any{{"a", "b", "c"}, {"x", "y", "z"}},
-			expected: [][]any{{"a", "x"}, {"b", "y"}, {"c", "z"}},
+			input:    zipper{{"a", "b", "c"}, {"x", "y", "z"}},
+			expected: zipper{{"a", "x"}, {"b", "y"}, {"c", "z"}},
 		},
 		{
 			name:     "integer slices",
-			input:    [][]any{{1, 2, 3}, {10, 20, 30}, {100, 200, 300}},
-			expected: [][]any{{1, 10, 100}, {2, 20, 200}, {3, 30, 300}},
+			input:    zipper{{1, 2, 3}, {10, 20, 30}, {100, 200, 300}},
+			expected: zipper{{1, 10, 100}, {2, 20, 200}, {3, 30, 300}},
 		},
 		{
 			name:     "with nil slice",
-			input:    [][]any{{1, 2}, nil, {3, 4}},
-			expected: [][]any{},
+			input:    zipper{{1, 2}, nil, {3, 4}},
+			expected: zipper{},
 		},
 		{
 			name:     "nil argument",
 			input:    nil,
-			expected: [][]any{},
+			expected: zipper{},
 		},
 		{
 			name:     "as nil slice",
-			input:    [][]any{},
-			expected: [][]any{},
+			input:    zipper{},
+			expected: zipper{},
 		},
 	}
 
@@ -91,7 +93,7 @@ func TestZip(t *testing.T) {
 
 func TestZipNoArgs(t *testing.T) {
 	result := zip()
-	expected := [][]any{}
+	expected := zipper{}
 
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("zip() = %v, want %v", result, expected)
@@ -103,7 +105,7 @@ func TestZipLargeSlices(t *testing.T) {
 	size := 1000
 	input1 := make([]any, size)
 	input2 := make([]any, size)
-	expected := make([][]any, size)
+	expected := make(zipper, size)
 
 	for i := 0; i < size; i++ {
 		input1[i] = i
