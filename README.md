@@ -5,13 +5,13 @@
 
       ## Installation
 
-      ```bash
+      ```
       go get github.com/dae-go/pythonify
       ```
 
       ## Usage
 
-      ```go
+      ```
       import "github.com/dae-go/pythonify"
       ```
 
