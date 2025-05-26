@@ -73,3 +73,9 @@ func (l *list) Reverse() {
 func (l *list) Sort() {
 
 }
+
+func (l *list) Copy() list {
+	newList := make(list, len(*l))
+	copy(newList, *l)
+	return newList
+}
