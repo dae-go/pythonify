@@ -29,7 +29,7 @@ func (s *Set[T]) Update(items ...T) {
 func (s *Set[T]) Remove(item T) {
 	_, ok := (*s)[item]
 	if !ok {
-		panic(fmt.Sprintf("%s not found", item))
+		panic(fmt.Sprintf("%v not found", item))
 	}
 	delete(*s, item)
 }
