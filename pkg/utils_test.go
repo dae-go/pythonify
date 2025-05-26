@@ -51,6 +51,32 @@ func TestZip(t *testing.T) {
 			input:    [][]any{{1, 2.5, "hello"}, {"world", 42, true}},
 			expected: [][]any{{1, "world"}, {2.5, 42}, {"hello", true}},
 		},
+		// ADDED: Previously separate test cases
+		{
+			name:     "string slices",
+			input:    [][]any{{"a", "b", "c"}, {"x", "y", "z"}},
+			expected: [][]any{{"a", "x"}, {"b", "y"}, {"c", "z"}},
+		},
+		{
+			name:     "integer slices",
+			input:    [][]any{{1, 2, 3}, {10, 20, 30}, {100, 200, 300}},
+			expected: [][]any{{1, 10, 100}, {2, 20, 200}, {3, 30, 300}},
+		},
+		{
+			name:     "with nil slice",
+			input:    [][]any{{1, 2}, nil, {3, 4}},
+			expected: [][]any{},
+		},
+		{
+			name:     "nil argument",
+			input:    nil,
+			expected: [][]any{},
+		},
+		{
+			name:     "as nil slice",
+			input:    [][]any{},
+			expected: [][]any{},
+		},
 	}
 
 	for _, tt := range tests {
@@ -64,48 +90,11 @@ func TestZip(t *testing.T) {
 }
 
 func TestZipNoArgs(t *testing.T) {
-	result := zip[[]any]()
+	result := zip()
 	expected := [][]any{}
 
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("zip() = %v, want %v", result, expected)
-	}
-}
-
-func TestZipWithNilSlice(t *testing.T) {
-	var nilSlice []any
-	result := zip([]any{1, 2}, nilSlice, []any{3, 4})
-	expected := [][]any{} // Should handle nil slice gracefully
-
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("zip with nil slice = %v, want %v", result, expected)
-	}
-}
-
-func TestZipStringSlices(t *testing.T) {
-	// Test with string slices specifically
-	input1 := []any{"a", "b", "c"}
-	input2 := []any{"x", "y", "z"}
-
-	result := zip(input1, input2)
-	expected := [][]any{{"a", "x"}, {"b", "y"}, {"c", "z"}}
-
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("zip string slices = %v, want %v", result, expected)
-	}
-}
-
-func TestZipIntSlices(t *testing.T) {
-	// Test with integer slices
-	input1 := []any{1, 2, 3}
-	input2 := []any{10, 20, 30}
-	input3 := []any{100, 200, 300}
-
-	result := zip(input1, input2, input3)
-	expected := [][]any{{1, 10, 100}, {2, 20, 200}, {3, 30, 300}}
-
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("zip int slices = %v, want %v", result, expected)
 	}
 }
 
