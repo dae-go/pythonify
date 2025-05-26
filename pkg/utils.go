@@ -7,7 +7,7 @@ func zip[T []any](iterables ...T) []T {
 
 	var (
 		minLen = len(iterables[0]) // updates in next for loop
-		zipped []T
+		zipped = []T{}
 	)
 
 	for _, i := range iterables {
