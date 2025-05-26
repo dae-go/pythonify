@@ -1,8 +1,8 @@
 package pkg
 
 func zip[T []any](iterables ...T) []T {
-	if len(iterables) < 2 {
-		return iterables
+	if len(iterables) == 0 {
+		return []T{}
 	}
 
 	var (
