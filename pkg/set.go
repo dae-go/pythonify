@@ -44,3 +44,5 @@ func (s *Set[T]) Pop() T {
 	}
 	panic("Can't pop from an empty set.")
 }
+
+func (s *Set[T]) Clear() { clear(*s) }

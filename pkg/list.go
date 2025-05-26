@@ -1,35 +1,35 @@
 package pkg
 
-type list []any
+type List[T comparable] []T
 
 // Adding Elements
 
-func (l *list) Append(item any) {
+func (l *List[T]) Append(item T) {
 	*l = append(*l, item)
 }
 
-func (l *list) Extend(item ...any) {
+func (l *List[T]) Extend(item ...T) {
 	*l = append(*l, item...)
 }
 
-func (l *list) Insert(index int, item any) {
+func (l *List[T]) Insert(index int, item T) {
 	if index < 0 || index > len(*l) {
 		index = len(*l)
 	}
-	buf := append([]any{item}, (*l)[index:]...)
+	buf := append([]T{item}, (*l)[index:]...)
 	*l = append((*l)[:index], buf...)
 }
 
 // Removing Elements
 
-func (l *list) Pop(index int) any {
+func (l *List[T]) Pop(index int) T {
 
 	r := (*l)[index]
 	*l = append((*l)[:index], (*l)[index+1:]...)
 	return r
 }
 
-func (l *list) Remove(item any) {
+func (l *List[T]) Remove(item T) {
 	for i, v := range *l {
 		if v == item {
 			*l = append((*l)[:i], (*l)[i+1:]...)
@@ -38,23 +38,21 @@ func (l *list) Remove(item any) {
 	}
 }
 
-func (l *list) Clear() {
-	*l = (*l)[:0]
-}
+func (l *List[T]) Clear() { clear(*l) }
 
 // Searching Elements
 
-func (l *list) Index(item any) int {
+func (l *List[T]) Index(item T) int {
 	for i, v := range *l {
 		if v == item {
 			return i
 		}
 	}
 
-	panic("Item not found in list")
+	panic("Item not found in List")
 }
 
-func (l *list) Count(item any) int {
+func (l *List[T]) Count(item T) int {
 	count := 0
 	for _, v := range *l {
 		if v == item {
@@ -66,16 +64,16 @@ func (l *list) Count(item any) int {
 
 // Modify Elements/List
 
-func (l *list) Reverse() {
+func (l *List[T]) Reverse() {
 
 }
 
-func (l *list) Sort() {
+func (l *List[T]) Sort() {
 
 }
 
-func (l *list) Copy() list {
-	newList := make(list, len(*l))
+func (l *List[T]) Copy() List[T] {
+	newList := make(List[T], len(*l))
 	copy(newList, *l)
 	return newList
 }
