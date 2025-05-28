@@ -83,20 +83,20 @@ func TestZip(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := zip(tt.input...)
+			result := Zip(tt.input...)
 			if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("zip(%v) = %v, want %v", tt.input, result, tt.expected)
+				t.Errorf("Zip(%v) = %v, want %v", tt.input, result, tt.expected)
 			}
 		})
 	}
 }
 
 func TestZipNoArgs(t *testing.T) {
-	result := zip()
+	result := Zip()
 	expected := zipper{}
 
 	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("zip() = %v, want %v", result, expected)
+		t.Errorf("Zip() = %v, want %v", result, expected)
 	}
 }
 
@@ -107,16 +107,16 @@ func TestZipLargeSlices(t *testing.T) {
 	input2 := make([]any, size)
 	expected := make(zipper, size)
 
-	for i := 0; i < size; i++ {
+	for i := range size {
 		input1[i] = i
 		input2[i] = i * 2
 		expected[i] = []any{i, i * 2}
 	}
 
-	result := zip(input1, input2)
+	result := Zip(input1, input2)
 
 	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("zip large slices failed")
+		t.Errorf("Zip large slices failed")
 	}
 }
 
@@ -126,8 +126,8 @@ func BenchmarkZipSmall(b *testing.B) {
 	input2 := []any{4, 5, 6}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		zip(input1, input2)
+	for b.Loop() {
+		Zip(input1, input2)
 	}
 }
 
@@ -136,14 +136,14 @@ func BenchmarkZipMedium(b *testing.B) {
 	input1 := make([]any, size)
 	input2 := make([]any, size)
 
-	for i := 0; i < size; i++ {
+	for i := range size {
 		input1[i] = i
 		input2[i] = i * 2
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		zip(input1, input2)
+	for b.Loop() {
+		Zip(input1, input2)
 	}
 }
 
@@ -152,13 +152,13 @@ func BenchmarkZipLarge(b *testing.B) {
 	input1 := make([]any, size)
 	input2 := make([]any, size)
 
-	for i := 0; i < size; i++ {
+	for i := range size {
 		input1[i] = i
 		input2[i] = i * 2
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		zip(input1, input2)
+	for b.Loop() {
+		Zip(input1, input2)
 	}
 }

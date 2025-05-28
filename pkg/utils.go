@@ -1,6 +1,6 @@
 package pkg
 
-func zip[T []any](iterables ...T) []T {
+func Zip[T []any](iterables ...T) []T {
 	if len(iterables) == 0 {
 		return []T{}
 	}
