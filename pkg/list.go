@@ -1,5 +1,10 @@
 package pkg
 
+import (
+	"cmp"
+	"slices"
+)
+
 type List[T comparable] []T
 
 // Adding Elements
@@ -43,13 +48,7 @@ func (l *List[T]) Clear() { clear(*l) }
 // Searching Elements
 
 func (l *List[T]) Index(item T) int {
-	for i, v := range *l {
-		if v == item {
-			return i
-		}
-	}
-
-	panic("Item not found in List")
+	return slices.Index(*l, item)
 }
 
 func (l *List[T]) Count(item T) int {
@@ -64,12 +63,19 @@ func (l *List[T]) Count(item T) int {
 
 // Modify Elements/List
 
-func (l *List[T]) Reverse() {
-
-}
+func (l *List[T]) Reverse() { slices.Reverse(*l) }
 
 func (l *List[T]) Sort() {
+	defer func() {
+		r := recover()
+		if r != nil {
+			panic("List type not sortable")
+		}
+	}()
 
+	slices.SortFunc(*l, func(a, b T) int {
+		return cmp.Compare(any(a), any(b))
+	})
 }
 
 func (l *List[T]) Copy() List[T] {

@@ -39,11 +39,11 @@ func Zip[T []any](iters ...T) []T {
 	return zipped
 }
 
-func Any(iter []any, predicate func(t any) bool) bool {
+func Any[T any](iter []T, predicate func(t T) bool) bool {
 	return slices.ContainsFunc(iter, predicate)
 }
 
-func All(iter []any, predicate func(t any) bool) bool {
+func All[T any](iter []T, predicate func(t T) bool) bool {
 	rVal := true
 	for _, item := range iter {
 		rVal = predicate(item)
@@ -88,9 +88,70 @@ func Pow[T Number](x, y T) T {
 	return rVal
 }
 
-func Map()    {}
-func Filter() {}
 
 func Print(val ...any) {
 	fmt.Println(val...) // LOL
 }
+
+// Collection and iteration functions
+func Enumerate(iterable []any, start int) []struct{Index int; Value any} {}
+func Filter(function func(any) bool, iterable []any) []any {}
+func Map(function func(any) any, iterable []any, iterables ...[]any) []any {}
+func Max(iterable []any, key func(any) any, defaultValue any) any {}
+func Min(iterable []any, key func(any) any, defaultValue any) any {}
+func Reversed(seq []any) []any {}
+func Sorted(iterable []any, key func(any) any, reverse bool) []any {}
+
+// Type conversion and creation functions
+func [T Number]Abs(x T) T {
+	return T(math.Abs(float64(x)))
+}
+func Ascii(obj any) string {}
+func Bin(x int) string {}
+func Bool(x any) bool {}
+func ByteArray(source any, encoding string, errors string) []byte {}
+func Bytes(source any, encoding string, errors string) []byte {}
+func Chr(i int) string {}
+func Complex(real float64, imag float64) complex128 {}
+func Dict(mapping any, kwargs ...any) map[any]any {}
+func Float(x any) float64 {}
+func FrozenSet(iterable []any) map[any]struct{} {}
+func Hex(x int) string {}
+func Int(x any, base int) int {}
+func Oct(x int) string {}
+func Ord(c string) int {}
+func Str(obj any, encoding string, errors string) string {}
+func Tuple(iterable []any) []any {}
+
+// Object and attribute functions
+func Callable(obj any) bool {}
+func DelAttr(obj any, name string) {}
+func Dir(obj any) []string {}
+func GetAttr(obj any, name string, defaultValue any) any {}
+func Globals() map[string]any {}
+func HasAttr(obj any, name string) bool {}
+func Hash(obj any) int {}
+func Id(obj any) uintptr {}
+func IsInstance(obj any, classinfo any) bool {}
+func IsSubClass(class any, classinfo any) bool {}
+func Locals() map[string]any {}
+func Repr(obj any) string {}
+func SetAttr(obj any, name string, value any) {}
+func Type(obj any) any {}
+func Vars(obj any) map[string]any {}
+
+// Iterator and generator functions
+func Iter(obj any, sentinel any) any {}
+func Next(iterator any, defaultValue any) any {}
+
+// Math and numeric functions
+func Round(number float64, ndigits int) float64 {}
+
+// I/O functions
+func Input(prompt string) string {}
+func Open(file string, mode string, buffering int, encoding string, errors string, newline string, closefd bool, opener func(string, int) int) any {}
+
+// Code execution and compilation
+func Compile(source string, filename string, mode string, flags int, dontInherit bool, optimize int) any {}
+func Eval(expression string, globals map[string]any, locals map[string]any) any {}
+func Exec(source string, globals map[string]any, locals map[string]any) {}
