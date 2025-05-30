@@ -72,9 +72,11 @@ func (l *List[T]) Sort() {
 			panic("List type not sortable")
 		}
 	}()
-
 	slices.SortFunc(*l, func(a, b T) int {
-		return cmp.Compare(any(a), any(b))
+		if cmp.Ordered(a) {
+
+		}
+		return cmp.Compare(cmp.Ordered(a), any(b))
 	})
 }
 
