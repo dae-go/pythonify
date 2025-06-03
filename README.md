@@ -1,21 +1,21 @@
 
-    # pythonify
+# pythonify
 
-    This is a Go library extracted from [daedalus-mono](https://github.com/daedalus-mono/).
+This is a Go library extracted from [daedalus-mono](https://github.com/daedalus-mono/).
 
-    ## Installation
+## Installation
 
-    ```bash
-    go get github.com/dae-go/pythonify
-    ```
+```bash
+go get github.com/dae-go/pythonify
+```
 
-    ## Usage
+## Usage
 
-    ```go
-    import "github.com/dae-go/pythonify"
-    ```
+```go
+import "github.com/dae-go/pythonify"
+```
 
-    ## Development
+## Development
 
-    This library is automatically synced from the monorepo. Please make changes in the [main repository](https://github.com/icarus612/daedalus-monorepo/tree/main/libs/golang/pythonify).
-    
+This library is automatically synced from the monorepo. Please make changes in the [main repository](https://github.com/icarus612/daedalus-monorepo/tree/main/libs/golang/pythonify).
+
