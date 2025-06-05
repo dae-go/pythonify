@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 )
 
 type Set[T comparable] map[T]struct{}
@@ -46,3 +48,5 @@ func (s *Set[T]) Pop() T {
 }
 
 func (s *Set[T]) Clear() { clear(*s) }
+
+func (s *Set[T]) ToSlice() []T { return slices.Collect(maps.Keys(*s)) }

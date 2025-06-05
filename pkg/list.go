@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"cmp"
 	"slices"
 )
 
@@ -65,23 +64,16 @@ func (l *List[T]) Count(item T) int {
 
 func (l *List[T]) Reverse() { slices.Reverse(*l) }
 
-func (l *List[T]) Sort() {
-	defer func() {
-		r := recover()
-		if r != nil {
-			panic("List type not sortable")
-		}
-	}()
-	slices.SortFunc(*l, func(a, b T) int {
-		if cmp.Ordered(a) {
+func (l *List[T]) Sort() { slices.Sort(*l) }
 
-		}
-		return cmp.Compare(cmp.Ordered(a), any(b))
-	})
-}
+func (l *List[T]) SortFunc(cmp func(a, b T) int) { slices.SortFunc(*l, cmp) }
 
 func (l *List[T]) Copy() List[T] {
 	newList := make(List[T], len(*l))
 	copy(newList, *l)
 	return newList
+}
+
+func (l *List[T]) ToSlice() []T {
+	return append([]T{}, (*l)...)
 }
