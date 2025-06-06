@@ -1,4 +1,4 @@
-package pkg
+package py
 
 import (
 	"fmt"
@@ -44,15 +44,15 @@ func (t *Tuple[T]) String() string {
 	if len(t.elements) == 0 {
 		return "()"
 	}
-	
+
 	var parts []string
 	for _, elem := range t.elements {
 		parts = append(parts, fmt.Sprintf("%v", elem))
 	}
-	
+
 	if len(t.elements) == 1 {
 		return fmt.Sprintf("(%s,)", parts[0])
 	}
-	
+
 	return fmt.Sprintf("(%s)", strings.Join(parts, ", "))
 }
