@@ -7,6 +7,36 @@ import (
 
 type Dict map[any]any
 
+func NewDict(items ...any) Dict {
+	d := make(Dict)
+
+	if len(items) == 0 {
+		return d
+	}
+
+	// Handle single map argument
+	if len(items) == 1 {
+		switch v := items[0].(type) {
+		case map[any]any:
+			for k, val := range v {
+				d[k] = val
+			}
+			return d
+		case [][2]any:
+			for _, pair := range v {
+				d[pair[0]] = pair[1]
+			}
+			return d
+		}
+	}
+
+	for i := 0; i < len(items)-1; i += 2 {
+		d[items[i]] = items[i+1]
+	}
+
+	return d
+}
+
 func (d *Dict) Get(key any) any { return (*d)[key] }
 
 func (d *Dict) Keys() []any { return slices.Collect(maps.Keys(*d)) }

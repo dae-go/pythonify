@@ -7,6 +7,10 @@ import (
 
 type List[T comparable] []T
 
+func NewList[T comparable](items ...T) List[T] {
+	return List[T](items)
+}
+
 type Olist[T cmp.Ordered] List[T]
 
 func (l *Olist[T]) Sort() { slices.Sort(*l) }

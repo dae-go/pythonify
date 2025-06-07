@@ -34,3 +34,18 @@ func (t Tuple[T]) ToSlice() []T {
 	copy(result, t.elements)
 	return result
 }
+
+// Tuple not an actual slice so myTuple[x] does not work.
+func (t *Tuple[T]) Get(index int) (T, bool) {
+	var zero T
+
+	if index < 0 {
+		index = len(t.elements) + index
+	}
+
+	if index >= len(t.elements) {
+		return zero, false
+	}
+
+	return t.elements[index], true
+}
