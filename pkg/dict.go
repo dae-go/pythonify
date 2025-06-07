@@ -7,10 +7,6 @@ import (
 
 type Dict map[any]any
 
-type IsDict interface {
-	~map[any]any
-}
-
 func (d *Dict) Get(key any) any { return (*d)[key] }
 
 func (d *Dict) Keys() []any { return slices.Collect(maps.Keys(*d)) }
@@ -41,10 +37,24 @@ func (d *Dict) Pop(key any, defaultValue ...any) any {
 	return dv
 }
 
-func (d *Dict) PopItem() []any {}
+func (d *Dict) PopItem() ([2]any, bool) {
+	for k, v := range *d {
+		delete(*d, k)
+		return [2]any{k, v}, true
+	}
+	return [2]any{}, false
+}
 
-func (d *Dict) SetDefault(key any, defaultValue any) any {}
+func (d *Dict) SetDefault(key any, defaultValue any) any {
+	if value, exists := (*d)[key]; exists {
+		return value
+	}
+	(*d)[key] = defaultValue
+	return defaultValue
+}
 
 func (d *Dict) Update(other Dict) { maps.Copy(*d, other) }
 
 func (d *Dict) Clear() { clear(*d) }
+
+func (d Dict) ToSlice() [][2]any { return d.Items() }

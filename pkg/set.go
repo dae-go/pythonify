@@ -10,7 +10,8 @@ type Set[T comparable] map[T]struct{}
 
 func NewSet[T comparable](items ...T) Set[T] {
 	s := make(Set[T], len(items))
-	s.Update(items)
+	i := List[T](items)
+	s.Update(i)
 	return s
 }
 
@@ -20,7 +21,7 @@ func (s *Set[T]) Add(item T) {
 	(*s)[item] = struct{}{}
 }
 
-func (s *Set[T]) Update(iterators ...any) {
+func (s *Set[T]) Update(iterators ...Sliceable[T]) {
 
 	for _, iterator := range iterators {
 		i := Sliced[T](iterator)
@@ -53,13 +54,12 @@ func (s *Set[T]) Pop() T {
 
 func (s *Set[T]) Clear() { clear(*s) }
 
-func (s *Set[T]) ToSlice() []T { return slices.Collect(maps.Keys(*s)) }
-
 // Set Operations
 
 func (s *Set[T]) Union(other Set[T]) Set[T] {
 	result := s.Copy()
 	result.Update(other)
+	return result
 }
 
 func (s *Set[T]) Intersection(other Set[T]) Set[T] {}
@@ -107,3 +107,5 @@ func (s *Set[T]) Contains(item T) bool {
 	_, ok := (*s)[item]
 	return ok
 }
+
+func (s Set[T]) ToSlice() []T { return slices.Collect(maps.Keys(s)) }

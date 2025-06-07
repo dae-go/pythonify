@@ -1,10 +1,15 @@
 package py
 
 import (
+	"cmp"
 	"slices"
 )
 
 type List[T comparable] []T
+
+type Olist[T cmp.Ordered] List[T]
+
+func (l *Olist[T]) Sort() { slices.Sort(*l) }
 
 // Adding Elements
 
@@ -64,8 +69,6 @@ func (l *List[T]) Count(item T) int {
 
 func (l *List[T]) Reverse() { slices.Reverse(*l) }
 
-func (l *List[T]) Sort() { slices.Sort(*l) }
-
 func (l *List[T]) SortFunc(cmp func(a, b T) int) { slices.SortFunc(*l, cmp) }
 
 func (l *List[T]) Copy() List[T] {
@@ -74,6 +77,6 @@ func (l *List[T]) Copy() List[T] {
 	return newList
 }
 
-func (l *List[T]) ToSlice() []T {
-	return append([]T{}, (*l)...)
+func (l List[T]) ToSlice() []T {
+	return append([]T{}, (l)...)
 }
