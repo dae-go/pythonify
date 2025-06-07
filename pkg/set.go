@@ -24,7 +24,7 @@ func (s *Set[T]) Add(item T) {
 func (s *Set[T]) Update(iterators ...Sliceable[T]) {
 
 	for _, iterator := range iterators {
-		i := Sliced[T](iterator)
+		i := iterator.ToSlice()
 		for _, item := range i {
 			s.Add(item)
 		}
@@ -41,7 +41,7 @@ func (s *Set[T]) Remove(item T) {
 	delete(*s, item)
 }
 
-func (s *Set[T]) Delete(item T) { delete(*s, item) }
+func (s *Set[T]) Discard(item T) { delete(*s, item) }
 
 func (s *Set[T]) Pop() T {
 
@@ -56,23 +56,61 @@ func (s *Set[T]) Clear() { clear(*s) }
 
 // Set Operations
 
-func (s *Set[T]) Union(other Set[T]) Set[T] {
+func (s *Set[T]) Union(other ...Sliceable[T]) Set[T] {
 	result := s.Copy()
-	result.Update(other)
+	result.Update(other...)
 	return result
 }
 
-func (s *Set[T]) Intersection(other Set[T]) Set[T] {}
+func (s *Set[T]) Intersection(other Set[T]) Set[T] {
+	result := s.Copy()
+	result.IntersectionUpdate(other)
+	return result
+}
 
-func (s *Set[T]) Difference(other Set[T]) Set[T] {}
+func (s *Set[T]) Difference(other Set[T]) Set[T] {
+	result := s.Copy()
+	result.DifferenceUpdate(other)
+	return result
+}
 
-func (s *Set[T]) SymmetricDifference(other Set[T]) Set[T] {}
+func (s *Set[T]) SymmetricDifference(other Set[T]) Set[T] {
+	result := s.Copy()
+	result.SymmetricDifferenceUpdate(other)
+	return result
+}
 
-func (s *Set[T]) IntersectionUpdate(other Set[T]) {}
+func (s *Set[T]) IntersectionUpdate(other ...Set[T]) {
+	if len(other) == 0 {
+		return
+	}
+	for k := range *s {
+		for _, o := range other {
+			if !o.Contains(k) {
+				s.Remove(k)
+				break
+			}
+		}
+	}
+}
 
-func (s *Set[T]) DifferenceUpdate(other Set[T]) {}
+func (s *Set[T]) DifferenceUpdate(other Set[T]) {
+	for k := range *s {
+		_, ok := other[k]
+		if ok {
+			s.Remove(k)
+		}
+	}
+}
 
-func (s *Set[T]) SymmetricDifferenceUpdate(other Set[T]) {}
+func (s *Set[T]) SymmetricDifferenceUpdate(other Set[T]) {
+	for k := range *s {
+		_, ok := other[k]
+		if !ok {
+			s.Remove(k)
+		}
+	}
+}
 
 // Set Comparisons
 
