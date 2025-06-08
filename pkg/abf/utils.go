@@ -52,7 +52,7 @@ func SortedFunc[T any](iterable []T, key func(T, T) int, reverse bool) []T {
 	return result
 }
 
-func Zip[S ~[]T, T any](iters ...S) []S {
+func Zip[T any, S ~[]T](iters ...S) []S {
 	if len(iters) == 0 {
 		return []S{}
 	}

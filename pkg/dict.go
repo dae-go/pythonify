@@ -5,10 +5,10 @@ import (
 	"slices"
 )
 
-type Dict map[any]any
+type Dict[K comparable, V any] map[K]V
 
-func NewDict(items ...any) Dict {
-	d := make(Dict)
+func NewDict[K comparable, V any](items ...any) Dict[K, V] {
+	d := make(Dict[K, V])
 
 	if len(items) == 0 {
 		return d
@@ -17,33 +17,39 @@ func NewDict(items ...any) Dict {
 	// Handle single map argument
 	if len(items) == 1 {
 		switch v := items[0].(type) {
-		case map[any]any:
-			for k, val := range v {
-				d[k] = val
-			}
+		case map[K]V:
+			maps.Copy(d, v)
 			return d
 		case [][2]any:
 			for _, pair := range v {
-				d[pair[0]] = pair[1]
+				if key, ok := pair[0].(K); ok {
+					if val, ok := pair[1].(V); ok {
+						d[key] = val
+					}
+				}
 			}
 			return d
 		}
 	}
 
 	for i := 0; i < len(items)-1; i += 2 {
-		d[items[i]] = items[i+1]
+		if key, ok := items[i].(K); ok {
+			if val, ok := items[i+1].(V); ok {
+				d[key] = val
+			}
+		}
 	}
 
 	return d
 }
 
-func (d *Dict) Get(key any) any { return (*d)[key] }
+func (d *Dict[K, V]) Get(key K) V { return (*d)[key] }
 
-func (d *Dict) Keys() []any { return slices.Collect(maps.Keys(*d)) }
+func (d *Dict[K, V]) Keys() []K { return slices.Collect(maps.Keys(*d)) }
 
-func (d *Dict) Values() []any { return slices.Collect(maps.Values(*d)) }
+func (d *Dict[K, V]) Values() []V { return slices.Collect(maps.Values(*d)) }
 
-func (d *Dict) Items() [][2]any {
+func (d *Dict[K, V]) Items() [][2]any {
 	result := make([][2]any, 0, len(*d))
 	for k, v := range *d {
 		result = append(result, [2]any{k, v})
@@ -51,23 +57,21 @@ func (d *Dict) Items() [][2]any {
 	return result
 }
 
-func (d *Dict) Copy() Dict { return maps.Clone(*d) }
+func (d *Dict[K, V]) Copy() Dict[K, V] { return maps.Clone(*d) }
 
-func (d *Dict) Pop(key any, defaultValue ...any) any {
-	var dv any
-
+func (d *Dict[K, V]) Pop(key K, defaultValue ...V) V {
+	if val, exists := (*d)[key]; exists {
+		delete(*d, key)
+		return val
+	}
 	if len(defaultValue) > 0 {
-		dv = defaultValue[0]
+		return defaultValue[0]
 	}
-	v, ok := (*d)[key]
-
-	if ok {
-		return v
-	}
-	return dv
+	var zero V
+	return zero
 }
 
-func (d *Dict) PopItem() ([2]any, bool) {
+func (d *Dict[K, V]) PopItem() ([2]any, bool) {
 	for k, v := range *d {
 		delete(*d, k)
 		return [2]any{k, v}, true
@@ -75,7 +79,7 @@ func (d *Dict) PopItem() ([2]any, bool) {
 	return [2]any{}, false
 }
 
-func (d *Dict) SetDefault(key any, defaultValue any) any {
+func (d *Dict[K, V]) SetDefault(key K, defaultValue V) V {
 	if value, exists := (*d)[key]; exists {
 		return value
 	}
@@ -83,8 +87,8 @@ func (d *Dict) SetDefault(key any, defaultValue any) any {
 	return defaultValue
 }
 
-func (d *Dict) Update(other Dict) { maps.Copy(*d, other) }
+func (d *Dict[K, V]) Update(other Dict[K, V]) { maps.Copy(*d, other) }
 
-func (d *Dict) Clear() { clear(*d) }
+func (d *Dict[K, V]) Clear() { clear(*d) }
 
-func (d Dict) ToSlice() [][2]any { return d.Items() }
+func (d Dict[K, V]) ToSlice() [][2]any { return d.Items() }

@@ -283,8 +283,8 @@ func Type(obj any) any {
 	return reflect.TypeOf(obj)
 }
 
-func Vars(obj any) map[string]any {
-	result := make(map[string]any)
+func Vars[T any](obj T) Dict[T, any] {
+	result := make(Dict[T, any])
 
 	if obj == nil {
 		return result
@@ -367,10 +367,10 @@ func Zip[T comparable](iters ...Sliceable[T]) Alist[List[T]] {
 		s.Append(i.ToSlice())
 	}
 
-	zipped := abf.Zip(s...)
+	zipped := abf.Zip[T](s...)
 	result := make(Alist[List[T]], len(zipped))
 	for i, z := range zipped {
-		result[i] = List[T](z)
+		result[i] = NewList(z...)
 	}
 	return result
 }
