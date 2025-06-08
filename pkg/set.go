@@ -17,6 +17,20 @@ func NewSet[T comparable](items ...T) Set[T] {
 	return s
 }
 
+type FrozenSet[T comparable] struct {
+	value map[T]struct{}
+}
+
+func NewFrozenSet[T comparable](items ...T) FrozenSet[T] {
+	result := make(map[T]struct{})
+	for _, v := range items {
+		result[v] = struct{}{}
+	}
+	return FrozenSet[T]{
+		value: result,
+	}
+}
+
 // Adding Elements
 
 func (s *Set[T]) Add(item T) {
