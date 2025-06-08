@@ -6,10 +6,12 @@ import (
 	"slices"
 )
 
-type Set[T comparable] map[T]struct{}
+type Set[T comparable] struct {
+	value map[T]struct{}
+}
 
 func NewSet[T comparable](items ...T) Set[T] {
-	s := make(Set[T], len(items))
+	s := Set[T]{}
 	i := List[T](items)
 	s.Update(i)
 	return s
@@ -18,7 +20,7 @@ func NewSet[T comparable](items ...T) Set[T] {
 // Adding Elements
 
 func (s *Set[T]) Add(item T) {
-	(*s)[item] = struct{}{}
+	s.value[item] = struct{}{}
 }
 
 func (s *Set[T]) Update(iterators ...Sliceable[T]) {
@@ -34,25 +36,25 @@ func (s *Set[T]) Update(iterators ...Sliceable[T]) {
 // Removing Elements
 
 func (s *Set[T]) Remove(item T) {
-	_, ok := (*s)[item]
+	_, ok := s.value[item]
 	if !ok {
 		panic(fmt.Sprintf("%v not found", item))
 	}
-	delete(*s, item)
+	delete(s.value, item)
 }
 
-func (s *Set[T]) Discard(item T) { delete(*s, item) }
+func (s *Set[T]) Discard(item T) { delete(s.value, item) }
 
 func (s *Set[T]) Pop() T {
 
-	for item := range *s {
-		delete(*s, item)
+	for item := range s.value {
+		delete(s.value, item)
 		return item
 	}
 	panic("Can't pop from an empty set.")
 }
 
-func (s *Set[T]) Clear() { clear(*s) }
+func (s *Set[T]) Clear() { clear(s.value) }
 
 // Set Operations
 
@@ -84,7 +86,7 @@ func (s *Set[T]) IntersectionUpdate(other ...Set[T]) {
 	if len(other) == 0 {
 		return
 	}
-	for k := range *s {
+	for k := range s.value {
 		for _, o := range other {
 			if !o.Contains(k) {
 				s.Remove(k)
@@ -95,8 +97,8 @@ func (s *Set[T]) IntersectionUpdate(other ...Set[T]) {
 }
 
 func (s *Set[T]) DifferenceUpdate(other Set[T]) {
-	for k := range *s {
-		_, ok := other[k]
+	for k := range s.value {
+		_, ok := other.value[k]
 		if ok {
 			s.Remove(k)
 		}
@@ -104,8 +106,8 @@ func (s *Set[T]) DifferenceUpdate(other Set[T]) {
 }
 
 func (s *Set[T]) SymmetricDifferenceUpdate(other Set[T]) {
-	for k := range *s {
-		_, ok := other[k]
+	for k := range s.value {
+		_, ok := other.value[k]
 		if !ok {
 			s.Remove(k)
 		}
@@ -116,11 +118,11 @@ func (s *Set[T]) SymmetricDifferenceUpdate(other Set[T]) {
 
 func (s *Set[T]) IsDisjoint(other Set[T]) bool {
 	l := s.Union(other)
-	return len(l) == len(*s)+len(other)
+	return len(l) == len(s.value)+len(other.value)
 }
 
 func (s *Set[T]) IsSubset(other Set[T]) bool {
-	for val := range *s {
+	for val := range s.value {
 		if !other.Contains(val) {
 			return false
 		}
@@ -129,7 +131,7 @@ func (s *Set[T]) IsSubset(other Set[T]) bool {
 }
 
 func (s *Set[T]) IsSuperset(other Set[T]) bool {
-	for val := range other {
+	for val := range other.value {
 		if !s.Contains(val) {
 			return false
 		}
@@ -139,11 +141,11 @@ func (s *Set[T]) IsSuperset(other Set[T]) bool {
 
 // Other Methods
 
-func (s *Set[T]) Copy() Set[T] { return maps.Clone(*s) }
+func (s *Set[T]) Copy() Set[T] { return NewSet(s.ToSlice()...) }
 
 func (s *Set[T]) Contains(item T) bool {
-	_, ok := (*s)[item]
+	_, ok := s.value[item]
 	return ok
 }
 
-func (s Set[T]) ToSlice() []T { return slices.Collect(maps.Keys(s)) }
+func (s Set[T]) ToSlice() []T { return slices.Collect(maps.Keys(s.value)) }
