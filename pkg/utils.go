@@ -335,71 +335,44 @@ func Open(file string, mode string, buffering int, encoding string, errors strin
 	return nil
 }
 
+func Len[T comparable](val Sliceable[T]) int {
+	return len(val.ToSlice())
+}
+
 // Generic versions of ABF
 
-func Filter[T any](fn func(T) bool, iterator []T) []T {
-	result := *new([]T)
-	for _, v := range iterator {
-		if fn(v) {
-			result = append(result, v)
-		}
-	}
-	return result
+func Filter[T comparable](fn func(T) bool, iterator Sliceable[T]) List[T] {
+	return abf.Filter(fn, iterator.ToSlice())
 }
 
-func Map[T any, U any](fn func(T) U, iterator []T) []U {
-	result := make([]U, len(iterator))
-	for i, v := range iterator {
-		result[i] = fn(v)
-	}
-	return result
+func Map[T any, U comparable](fn func(T) U, iterator Sliceable[T]) List[U] {
+	return abf.Map(fn, iterator.ToSlice())
 }
 
-func Reversed(iterable []any) []any {
-	result := slices.Clone(iterable)
-	slices.Reverse(result)
-	return result
-}
-func Sorted[T cmp.Ordered](iterable []T, reverse bool) []T {
-	result := slices.Clone(iterable)
-	slices.Sort(result)
-	return result
+func Reversed[T comparable](iterable Sliceable[T]) List[T] {
+	return NewList(abf.Reversed(iterable.ToSlice())...)
 }
 
-func SortedFunc[T comparable](iterable Sliceable[T], key func(any, any) int, reverse bool) List[T] {
-	result := slices.Clone(iterable)
-	slices.SortFunc(result, key)
-	if reverse {
-		return Reversed(result)
-	}
-	return result
+func Sorted[T cmp.Ordered](iterable Sliceable[T], reverse bool) List[T] {
+	return NewList(abf.Sorted(iterable.ToSlice(), reverse)...)
 }
 
-func Zip[T comparable](iters ...Sliceable[T]) List[T] {
-	if len(iters) == 0 {
-		return List[T]{}
-	}
+func SortedFunc[T comparable](iterable Sliceable[T], key func(T, T) int, reverse bool) List[T] {
+	return NewList(abf.SortedFunc(iterable.ToSlice(), key, reverse)...)
+}
 
-	var (
-		minLen = len(iters[0]) // updates in next for loop
-		zipped = []T{}
-	)
-
+func Zip[T comparable](iters ...Sliceable[T]) []List[T] {
+	slices := make([][]T, 0, len(iters))
 	for _, i := range iters {
-		if len(i) < minLen {
-			minLen = len(i)
-		}
+		slices = append(slices, i.ToSlice())
 	}
-
-	for i := range minLen {
-		var next T
-		for _, iterator := range iters {
-			next = append(next, iterator[i])
-		}
-		zipped = append(zipped, next)
+	
+	zipped := abf.Zip(slices...)
+	result := make([]List[T], len(zipped))
+	for i, z := range zipped {
+		result[i] = List[T](z)
 	}
-
-	return zipped
+	return result
 }
 
 func Any[T any](iterator Sliceable[T], predicate func(t T) bool) bool {

@@ -1,18 +1,18 @@
 package py
 
 type Tuple[T comparable] struct {
-	elements []T
+	value []T
 }
 
-func NewTuple[T comparable](elements ...T) *Tuple[T] {
+func NewTuple[T comparable](value ...T) *Tuple[T] {
 	return &Tuple[T]{
-		elements: append([]T(nil), elements...),
+		value: append([]T(nil), value...),
 	}
 }
 
 func (t *Tuple[T]) Count(value T) int {
 	count := 0
-	for _, elem := range t.elements {
+	for _, elem := range t.value {
 		if elem == value {
 			count++
 		}
@@ -21,7 +21,7 @@ func (t *Tuple[T]) Count(value T) int {
 }
 
 func (t *Tuple[T]) Index(value T) int {
-	for i, elem := range t.elements {
+	for i, elem := range t.value {
 		if elem == value {
 			return i
 		}
@@ -30,8 +30,8 @@ func (t *Tuple[T]) Index(value T) int {
 }
 
 func (t Tuple[T]) ToSlice() []T {
-	result := make([]T, len(t.elements))
-	copy(result, t.elements)
+	result := make([]T, len(t.value))
+	copy(result, t.value)
 	return result
 }
 
@@ -40,12 +40,12 @@ func (t *Tuple[T]) Get(index int) (T, bool) {
 	var zero T
 
 	if index < 0 {
-		index = len(t.elements) + index
+		index = len(t.value) + index
 	}
 
-	if index >= len(t.elements) {
+	if index >= len(t.value) {
 		return zero, false
 	}
 
-	return t.elements[index], true
+	return t.value[index], true
 }

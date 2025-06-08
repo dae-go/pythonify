@@ -29,7 +29,7 @@ func Map[T any, U any](fn func(T) U, iterator []T) []U {
 	return result
 }
 
-func Reversed(iterable []any) []any {
+func Reversed[T any](iterable []T) []T {
 	result := slices.Clone(iterable)
 	slices.Reverse(result)
 	return result
@@ -37,10 +37,13 @@ func Reversed(iterable []any) []any {
 func Sorted[T cmp.Ordered](iterable []T, reverse bool) []T {
 	result := slices.Clone(iterable)
 	slices.Sort(result)
+	if reverse {
+		return Reversed(result)
+	}
 	return result
 }
 
-func SortedFunc(iterable []any, key func(any, any) int, reverse bool) []any {
+func SortedFunc[T any](iterable []T, key func(T, T) int, reverse bool) []T {
 	result := slices.Clone(iterable)
 	slices.SortFunc(result, key)
 	if reverse {
@@ -49,24 +52,21 @@ func SortedFunc(iterable []any, key func(any, any) int, reverse bool) []any {
 	return result
 }
 
-func Zip[T []any](iters ...T) []T {
+func Zip[S ~[]T, T any](iters ...S) []S {
 	if len(iters) == 0 {
-		return []T{}
+		return []S{}
 	}
 
-	var (
-		minLen = len(iters[0]) // updates in next for loop
-		zipped = []T{}
-	)
-
+	minLen := len(iters[0])
 	for _, i := range iters {
 		if len(i) < minLen {
 			minLen = len(i)
 		}
 	}
 
+	zipped := make([]S, 0, minLen)
 	for i := range minLen {
-		var next T
+		next := make(S, 0, len(iters))
 		for _, iterator := range iters {
 			next = append(next, iterator[i])
 		}
