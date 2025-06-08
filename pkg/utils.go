@@ -283,8 +283,8 @@ func Type(obj any) any {
 	return reflect.TypeOf(obj)
 }
 
-func Vars[T any](obj T) Dict[T, any] {
-	result := make(Dict[T, any])
+func Vars(obj any) Dict[string, any] {
+	result := make(Dict[string, any])
 
 	if obj == nil {
 		return result
