@@ -361,14 +361,14 @@ func SortedFunc[T comparable](iterable Sliceable[T], key func(T, T) int, reverse
 	return NewList(abf.SortedFunc(iterable.ToSlice(), key, reverse)...)
 }
 
-func Zip[T comparable](iters ...Sliceable[T]) []List[T] {
-	slices := make([][]T, 0, len(iters))
+func Zip[T comparable](iters ...Sliceable[T]) Alist[List[T]] {
+	s := make(Alist[List[T]], 0, len(iters))
 	for _, i := range iters {
-		slices = append(slices, i.ToSlice())
+		s.Append(i.ToSlice())
 	}
-	
-	zipped := abf.Zip(slices...)
-	result := make([]List[T], len(zipped))
+
+	zipped := abf.Zip(s...)
+	result := make(Alist[List[T]], len(zipped))
 	for i, z := range zipped {
 		result[i] = List[T](z)
 	}
