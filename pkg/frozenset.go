@@ -9,27 +9,12 @@ type FrozenSet[T comparable] struct {
 	value map[T]struct{}
 }
 
-
-// FrozenSet constructors
 func NewFrozenSet[T comparable](items ...T) FrozenSet[T] {
 	result := make(map[T]struct{})
 	for _, v := range items {
 		result[v] = struct{}{}
 	}
 	return FrozenSet[T]{value: result}
-}
-
-// Set constructors
-func NewSet[T comparable](items ...T) Set[T] {
-	s := Set[T]{
-		FrozenSet: FrozenSet[T]{
-			value: make(map[T]struct{}),
-		},
-	}
-	for _, item := range items {
-		s.value[item] = struct{}{}
-	}
-	return s
 }
 
 func (s FrozenSet[T]) Contains(item T) bool {
@@ -83,7 +68,6 @@ func (s FrozenSet[T]) IsSuperset(other Sliceable[T]) bool {
 	return true
 }
 
-// Immutable set operations that return new FrozenSets
 func (s FrozenSet[T]) Union(others ...Sliceable[T]) BasicSet[T] {
 	result := make(map[T]struct{})
 	for k := range s.value {
@@ -103,7 +87,6 @@ func (s FrozenSet[T]) Intersection(others ...Sliceable[T]) BasicSet[T] {
 	}
 	result := make(map[T]struct{})
 
-	// Convert all others to maps for efficient lookup
 	otherMaps := make([]map[T]struct{}, len(others))
 	for i, other := range others {
 		otherMaps[i] = make(map[T]struct{})

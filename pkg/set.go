@@ -6,6 +6,18 @@ type Set[T comparable] struct {
 	FrozenSet[T]
 }
 
+func NewSet[T comparable](items ...T) Set[T] {
+	s := Set[T]{
+		FrozenSet: FrozenSet[T]{
+			value: make(map[T]struct{}),
+		},
+	}
+	for _, item := range items {
+		s.value[item] = struct{}{}
+	}
+	return s
+}
+
 func (s *Set[T]) Add(item T) {
 	s.value[item] = struct{}{}
 }
@@ -47,7 +59,6 @@ func (s *Set[T]) IntersectionUpdate(others ...Sliceable[T]) {
 		return
 	}
 
-	// Convert all others to maps for efficient lookup
 	otherMaps := make([]map[T]struct{}, len(others))
 	for i, other := range others {
 		otherMaps[i] = make(map[T]struct{})
@@ -86,7 +97,6 @@ func (s *Set[T]) SymmetricDifferenceUpdate(other Sliceable[T]) {
 	}
 }
 
-// Set-specific methods that return the correct interface type
 func (s Set[T]) Copy() BasicSet[T] {
 	return Set[T]{
 		FrozenSet: s.FrozenSet.Copy().(FrozenSet[T]),
