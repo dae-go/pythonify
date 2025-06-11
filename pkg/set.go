@@ -53,7 +53,6 @@ func (s *Set[T]) Clear() {
 	clear(s.value)
 }
 
-// In-place set operations
 func (s *Set[T]) IntersectionUpdate(others ...Sliceable[T]) {
 	if len(others) == 0 {
 		return
