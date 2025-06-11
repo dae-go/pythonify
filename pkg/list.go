@@ -1,15 +1,6 @@
 package py
 
-import (
-	"cmp"
-	"slices"
-)
-
-type Alist[T any] []T
-
-func NewAlist[T any](items ...T) Alist[T] {
-	return Alist[T](items)
-}
+import "slices"
 
 type List[T comparable] Alist[T]
 
@@ -17,60 +8,24 @@ func NewList[T comparable](items ...T) List[T] {
 	return List[T](items)
 }
 
-type Olist[T cmp.Ordered] List[T]
+func (l *List[T]) Len() int                      { return (*Alist[T])(l).Len() }
+func (l *List[T]) Append(item T)                 { (*Alist[T])(l).Append(item) }
+func (l *List[T]) Extend(items ...T)             { (*Alist[T])(l).Extend(items...) }
+func (l *List[T]) Insert(index int, item T)      { (*Alist[T])(l).Insert(index, item) }
+func (l *List[T]) Pop(index int) T               { return (*Alist[T])(l).Pop(index) }
+func (l *List[T]) Clear()                        { (*Alist[T])(l).Clear() }
+func (l *List[T]) Reverse()                      { (*Alist[T])(l).Reverse() }
+func (l *List[T]) SortFunc(cmp func(a, b T) int) { (*Alist[T])(l).SortFunc(cmp) }
 
-func NewOlist[T cmp.Ordered](items ...T) Olist[T] {
-	return Olist[T](items)
-}
-
-func (l *Olist[T]) Sort() { slices.Sort(*l) }
-
-// Adding Elements
-
-func (l *Alist[T]) Append(item T) {
-	*l = append(*l, item)
-}
-
-func (l *Alist[T]) Extend(item ...T) {
-	*l = append(*l, item...)
-}
-
-func (l *Alist[T]) Insert(index int, item T) {
-	if index < 0 || index > len(*l) {
-		index = len(*l)
-	}
-	buf := append(Alist[T]{item}, (*l)[index:]...)
-	*l = append((*l)[:index], buf...)
-}
-
-// Removing Elements
-
-func (l *Alist[T]) Pop(index int) T {
-
-	r := (*l)[index]
-	*l = append((*l)[:index], (*l)[index+1:]...)
-	return r
-}
-
-func (l *Alist[T]) Clear() { clear(*l) }
-
-// Modify Elements/List
-
-func (l *Alist[T]) Reverse() { slices.Reverse(*l) }
-
-func (l *Alist[T]) SortFunc(cmp func(a, b T) int) { slices.SortFunc(*l, cmp) }
-
-func (l *Alist[T]) Copy() List[T] {
+func (l *List[T]) Copy() BasicList[T] {
 	newList := make(List[T], len(*l))
 	copy(newList, *l)
-	return newList
+	return &newList
 }
 
-func (l Alist[T]) ToSlice() []T {
-	return append([]T{}, (l)...)
+func (l List[T]) ToSlice() []T {
+	return append([]T{}, l...)
 }
-
-// List only
 
 func (l *List[T]) Index(item T) int {
 	return slices.Index(*l, item)
@@ -84,6 +39,7 @@ func (l *List[T]) Remove(item T) {
 		}
 	}
 }
+
 func (l *List[T]) Count(item T) int {
 	count := 0
 	for _, v := range *l {

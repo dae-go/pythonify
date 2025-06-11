@@ -9,66 +9,159 @@ type FrozenSet[T comparable] struct {
 	value map[T]struct{}
 }
 
+
+// FrozenSet constructors
 func NewFrozenSet[T comparable](items ...T) FrozenSet[T] {
 	result := make(map[T]struct{})
 	for _, v := range items {
 		result[v] = struct{}{}
 	}
-	return FrozenSet[T]{
-		value: result,
+	return FrozenSet[T]{value: result}
+}
+
+// Set constructors
+func NewSet[T comparable](items ...T) Set[T] {
+	s := Set[T]{
+		FrozenSet: FrozenSet[T]{
+			value: make(map[T]struct{}),
+		},
 	}
-}
-
-// Set Comparisons
-
-func (s *Set[T]) IsDisjoint(other Set[T]) bool {
-	l := s.Union(other)
-	return len(l) == len(s.value)+len(other.value)
-}
-
-func (s *Set[T]) IsSubset(other Set[T]) bool {
-	for val := range s.value {
-		if !other.Contains(val) {
-			return false
-		}
+	for _, item := range items {
+		s.value[item] = struct{}{}
 	}
-	return true
+	return s
 }
 
-func (s *Set[T]) IsSuperset(other Set[T]) bool {
-	for val := range other.value {
-		if !s.Contains(val) {
-			return false
-		}
-	}
-	return true
-}
-
-// Other Methods
-
-func (s *Set[T]) Copy() Set[T] { return NewSet(s.ToSlice()...) }
-
-func (s *Set[T]) Contains(item T) bool {
+func (s FrozenSet[T]) Contains(item T) bool {
 	_, ok := s.value[item]
 	return ok
 }
 
-func (s Set[T]) ToSlice() []T { return slices.Collect(maps.Keys(s.value)) }
-
-func (s *Set[T]) Union(other ...Sliceable[T]) Set[T] {
-	result := s.Copy()
-	result.Update(other...)
-	return result
+func (s FrozenSet[T]) Len() int {
+	return len(s.value)
 }
 
-func (s *Set[T]) Intersection(other Set[T]) Set[T] {
-	result := s.Copy()
-	result.IntersectionUpdate(other)
-	return result
+func (s FrozenSet[T]) ToSlice() []T {
+	return slices.Collect(maps.Keys(s.value))
 }
 
-func (s *Set[T]) Difference(other Set[T]) Set[T] {
-	result := s.Copy()
-	result.DifferenceUpdate(other)
-	return result
+func (s FrozenSet[T]) IsDisjoint(other Sliceable[T]) bool {
+	otherSlice := other.ToSlice()
+	otherMap := make(map[T]struct{})
+	for _, v := range otherSlice {
+		otherMap[v] = struct{}{}
+	}
+	for k := range s.value {
+		if _, ok := otherMap[k]; ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (s FrozenSet[T]) IsSubset(other Sliceable[T]) bool {
+	otherSlice := other.ToSlice()
+	otherMap := make(map[T]struct{})
+	for _, v := range otherSlice {
+		otherMap[v] = struct{}{}
+	}
+	for k := range s.value {
+		if _, ok := otherMap[k]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (s FrozenSet[T]) IsSuperset(other Sliceable[T]) bool {
+	otherSlice := other.ToSlice()
+	for _, v := range otherSlice {
+		if _, ok := s.value[v]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+// Immutable set operations that return new FrozenSets
+func (s FrozenSet[T]) Union(others ...Sliceable[T]) BasicSet[T] {
+	result := make(map[T]struct{})
+	for k := range s.value {
+		result[k] = struct{}{}
+	}
+	for _, other := range others {
+		for _, v := range other.ToSlice() {
+			result[v] = struct{}{}
+		}
+	}
+	return FrozenSet[T]{value: result}
+}
+
+func (s FrozenSet[T]) Intersection(others ...Sliceable[T]) BasicSet[T] {
+	if len(others) == 0 {
+		return s.Copy()
+	}
+	result := make(map[T]struct{})
+
+	// Convert all others to maps for efficient lookup
+	otherMaps := make([]map[T]struct{}, len(others))
+	for i, other := range others {
+		otherMaps[i] = make(map[T]struct{})
+		for _, v := range other.ToSlice() {
+			otherMaps[i][v] = struct{}{}
+		}
+	}
+
+outer:
+	for k := range s.value {
+		for _, otherMap := range otherMaps {
+			if _, ok := otherMap[k]; !ok {
+				continue outer
+			}
+		}
+		result[k] = struct{}{}
+	}
+	return FrozenSet[T]{value: result}
+}
+
+func (s FrozenSet[T]) Difference(other Sliceable[T]) BasicSet[T] {
+	result := make(map[T]struct{})
+	otherMap := make(map[T]struct{})
+	for _, v := range other.ToSlice() {
+		otherMap[v] = struct{}{}
+	}
+	for k := range s.value {
+		if _, ok := otherMap[k]; !ok {
+			result[k] = struct{}{}
+		}
+	}
+	return FrozenSet[T]{value: result}
+}
+
+func (s FrozenSet[T]) SymmetricDifference(other Sliceable[T]) BasicSet[T] {
+	result := make(map[T]struct{})
+	otherMap := make(map[T]struct{})
+	for _, v := range other.ToSlice() {
+		otherMap[v] = struct{}{}
+	}
+
+	for k := range s.value {
+		if _, ok := otherMap[k]; !ok {
+			result[k] = struct{}{}
+		}
+	}
+	for k := range otherMap {
+		if _, ok := s.value[k]; !ok {
+			result[k] = struct{}{}
+		}
+	}
+	return FrozenSet[T]{value: result}
+}
+
+func (s FrozenSet[T]) Copy() BasicSet[T] {
+	result := make(map[T]struct{})
+	for k := range s.value {
+		result[k] = struct{}{}
+	}
+	return FrozenSet[T]{value: result}
 }

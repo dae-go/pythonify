@@ -92,7 +92,7 @@ func TestZip(t *testing.T) {
 }
 
 func TestZipNoArgs(t *testing.T) {
-	result := Zip()
+	result := Zip[any, []any]()
 	expected := zipper{}
 
 	if !reflect.DeepEqual(result, expected) {
