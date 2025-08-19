@@ -1,0 +1,11 @@
+{
+  "name": "lib.golang.pythonify",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "go build ./...",
+    "dev": "echo 'No dev command for Go library'",
+    "test": "go test ./...",
+    "lint": "go vet ./... && go fmt ./..."
+  }
+}
